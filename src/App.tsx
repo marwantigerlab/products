@@ -22,7 +22,6 @@ const array: Product[] = [
 
 function App() {
   const categorizedItems: Record<string, Product[]> = {};
-  const topTwoPerformingItem: TopTwoPerformingItems = {};
 
   array.map((item: Product) => {
     const { category } = item;
@@ -30,25 +29,55 @@ function App() {
       categorizedItems[category] = [];
     }
     categorizedItems[category].push(item);
-  });
+  }); // O(n)
 
-  const sortCategoryArrayBasedOnSales = (category: string) => {
+  // categorizing is O(n)
+
+  const sortCategoryArrayBasedOnSales = (category: string, count: number) => {
+    const topPerformingItems: TopTwoPerformingItems = {};
+
     const sortedCategory = categorizedItems[category].sort(
       (a: Product, b: Product) => {
         return b.sales - a.sales;
       }
-    );
-    topTwoPerformingItem[category as keyof TopTwoPerformingItems] = [];
+    ); //O(log n)
 
-    topTwoPerformingItem[category].push(sortedCategory[0]);
-    topTwoPerformingItem[category].push(sortedCategory[1]);
+    topPerformingItems[category as keyof TopTwoPerformingItems] = [];
+
+    for (let i = 0; i < count; i++) {
+      if (!sortedCategory[i]) return;
+      topPerformingItems[category].push(sortedCategory[i]);
+    } // O(n)
+
+    return topPerformingItems;
+  }; // O(n log n)
+
+  const getTopPerformingItemsOfCategory = (category: string, count: number) => {
+    return sortCategoryArrayBasedOnSales(category, count);
   };
 
-  const getTopPerformingItemsOfCategory = (category: string) => {
-    return sortCategoryArrayBasedOnSales(category);
-  };
+  // getting highest sales is O(n log n)
 
-  getTopPerformingItemsOfCategory("Clothing");
+  getTopPerformingItemsOfCategory("Electronics", 2);
+
+  console.log(
+    "top performing two electronics",
+    getTopPerformingItemsOfCategory("Electronics", 2)
+  );
+  console.log(
+    "top performing three electronics",
+    getTopPerformingItemsOfCategory("Electronics", 3)
+  );
+
+  console.log(
+    "top performing one Clothing",
+    getTopPerformingItemsOfCategory("Clothing", 1)
+  );
+
+  console.log(
+    "top performing two Clothing",
+    getTopPerformingItemsOfCategory("Clothing", 2)
+  );
 
   return (
     <div className="App">
